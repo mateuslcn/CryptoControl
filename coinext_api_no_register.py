@@ -85,7 +85,7 @@ def obterBooks(coin):
   return call_post('GetL2Snapshot', payload)
 
 #Telegram bot mateusManaus_bot
-bot = telebot.TeleBot("1734494822:AAEV57FXwoqyBRYFWarnJoQgNMl-ILLqZlk")
+bot = telebot.TeleBot(str(values.find_one()['bot']))
 
 def main():
   
