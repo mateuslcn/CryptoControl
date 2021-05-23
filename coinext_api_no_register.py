@@ -9,7 +9,10 @@ import pandas as pd
 import matplotlib
 matplotlib.use('TKAgg')
 import pandas as pd
-import telebot
+import telebot #use pip install pyTelegramBotAPI
+import os
+import sys
+from IPython import get_ipython
 
 nextIvalue = 0
 cryptodict = {
@@ -84,45 +87,45 @@ def obterBooks(coin):
   }
   return call_post('GetL2Snapshot', payload)
 
-#Telegram bot mateusManaus_bot
+#Telegram bot
 bot = telebot.TeleBot(str(values.find_one()['bot']))
 
 def main():
   
-  cryptoCoin = ['BTC', 'ETH', 'DOGE']
-  soma = []
-  report_partial = ''
-  title= 'CRYPTOCOIN INVESTMENT INSTANT REPORT \n\n'
-  print(title)
-
-  for x in cryptoCoin:
-    data=obterBooks(cryptodict[x])
-    cryptoCurrentValue= data[0][4]
-    print(x, 'Current Value:', '%.2f' % cryptoCurrentValue)
-    print('Current Balance:', '%.2f' % get_info(cryptoCurrentValue, x), '\n')
-    soma.append(get_info(cryptoCurrentValue, x))
-    report_p = str(x) + ' Current Value: R$' + str('%.2f' % cryptoCurrentValue) + \
-    '\nCurrent Balance: R$' + str('%.2f' % get_info(cryptoCurrentValue, x)) + '\n'
-    report_partial = report_partial + report_p + '\n'
-  
-  buyedQuantityTotal = [float(values.find_one()['buyedQuantity'][1:-1].split(',')[0]), float(values.find_one()['buyedQuantity'][1:-1].split(',')[1]), float(values.find_one()['buyedQuantity'][1:-1].split(',')[2]), float(values.find_one()['buyedQuantity'][1:-1].split(',')[3]), float(values.find_one()['buyedQuantity'][1:-1].split(',')[4]), float(values.find_one()['buyedQuantity'][1:-1].split(',')[5])]
-  print('Initial Investiment=', '%.2f' % sum(buyedQuantityTotal),'\n')
-  print('Current Loss=', '%.2f' % sum(soma),'\n')
-  print('Total Current Balance=', '%.2f' % (sum(buyedQuantityTotal)+sum(soma)),'\n')
-  report_total = 'Initial Investiment = R$' + str('%.2f' % sum(buyedQuantityTotal)) + '\n' \
-  'Current Loss = R$' + str('%.2f' % sum(soma)) + '\n' + \
-  'Total Current Balance = R$' + str('%.2f' % (sum(buyedQuantityTotal) + sum(soma))) + '\n\n'
-  report = title+report_partial+report_total 
-
   @bot.message_handler(commands=['start', 'help'])
   def send_welcome(message):
-	  bot.reply_to(message, report)
+    cryptoCoin = ['BTC', 'ETH', 'DOGE']
+    soma = []
+    report_partial = ''
+    title= 'CRYPTOCOIN INVESTMENT INSTANT REPORT \n\n'
+    print(title)
 
+    for x in cryptoCoin:
+      data=obterBooks(cryptodict[x])
+      cryptoCurrentValue= data[0][4]
+      print(x, 'Current Value:', '%.2f' % cryptoCurrentValue)
+      print('Current Balance:', '%.2f' % get_info(cryptoCurrentValue, x), '\n')
+      soma.append(get_info(cryptoCurrentValue, x))
+      report_p = str(x) + ' Current Value: R$' + str('%.2f' % cryptoCurrentValue) + \
+     '\nCurrent Balance: R$' + str('%.2f' % get_info(cryptoCurrentValue, x)) + '\n'
+      report_partial = report_partial + report_p + '\n'
+  
+    buyedQuantityTotal = [float(values.find_one()['buyedQuantity'][1:-1].split(',')[0]), float(values.find_one()['buyedQuantity'][1:-1].split(',')[1]), float(values.find_one()['buyedQuantity'][1:-1].split(',')[2]), float(values.find_one()['buyedQuantity'][1:-1].split(',')[3]), float(values.find_one()['buyedQuantity'][1:-1].split(',')[4]), float(values.find_one()['buyedQuantity'][1:-1].split(',')[5])]
+    print('Initial Investiment=', '%.2f' % sum(buyedQuantityTotal),'\n')
+    print('Current Loss=', '%.2f' % sum(soma),'\n')
+    print('Total Current Balance=', '%.2f' % (sum(buyedQuantityTotal)+sum(soma)),'\n')
+    report_total = 'Initial Investiment = R$' + str('%.2f' % sum(buyedQuantityTotal)) + '\n' \
+    'Current Loss = R$' + str('%.2f' % sum(soma)) + '\n' + \
+    'Total Current Balance = R$' + str('%.2f' % (sum(buyedQuantityTotal) + sum(soma))) + '\n\n'
+    report = title+report_partial+report_total 
+    bot.reply_to(message, report)
+    bot.stop_polling()
+    
   @bot.message_handler(func=lambda message: True)
   def echo_all(message):
 	  bot.reply_to(message, message.text)
-    
+
+  bot.polling()    
+
 if __name__ == "__main__":
-  
-  main()
-  bot.polling()
+  while True: main()
